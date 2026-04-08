@@ -6,6 +6,26 @@ st.title("Commodity Correlation Dashboard")
 st.write("This dashboard displays the correlation between different commodities. Select a commodity to see its correlation with others.")
 
 tickers = {
+    #  INDEXES & ETFs 
+    "S&P 500 (E-mini)": "ES=F",
+    "Nasdaq 100 (E-mini)": "NQ=F",
+    "Dow Jones (E-mini)": "YM=F",
+    "Russell 2000": "RTY=F",
+    "S&P 500 (SPY)": "SPY",
+    "Nasdaq 100 (QQQ)": "QQQ",
+    "Russell 2000 (IWM)": "IWM",
+
+    # METALS & MINERS 
+    "Gold (Futures)": "GC=F",
+    "Silver (Futures)": "SI=F",
+    "Copper (Futures)": "HG=F",
+    "Gold ETF (GLD)": "GLD",
+    "Newmont Gold Mining": "NEM",
+    "Barrick Gold": "GOLD",
+    "Freeport-McMoRan (Copper)": "FCX",
+    "Southern Copper": "SCCO",
+    
+    # ENERGY & OIL STOCKS
     "Crude Oil": "CL=F",
     "Natural Gas": "NG=F",
     "Gold": "GC=F",
