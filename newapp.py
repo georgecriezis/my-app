@@ -45,6 +45,10 @@ def main():
         data1 = yf.download(tickers[asset1], period="12mo", progress=False, auto_adjust=True)["Close"]
         data2 = yf.download(tickers[asset2], period="12mo", progress=False, auto_adjust=True)["Close"]
 
+# Widget 3: Lookback Period
+        timeframe = st.sidebar.radio("Select Lookback Period:", 
+                                 ("6mo", "1y", "2y", "5y"), index=1)
+
         comparison_table = pd.concat([data1, data2], axis=1)
         comparison_table.columns = [asset1, asset2]
         comparison_table = comparison_table.dropna()
