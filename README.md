@@ -24,7 +24,7 @@ Normalized Performance Chart: Visual price comparison starting from a base of 10
 Educational Expander: Built-in guide to help users interpret correlation scores.
 
 Deployed App Link:
-
+https://correlationdashboard.streamlit.app/
 
 How to Use
 Use the dropdown menus to pick two different assets.
