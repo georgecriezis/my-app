@@ -1,53 +1,60 @@
 import streamlit as st
 import pandas as pd
 import yfinance as yf
-import numpy as np
 
-st.title("Commodity Correlation & 'What-If' Simulator")
+st.title("Commodity Correlation Dashboard")
+st.write("This dashboard displays the correlation between different commodities. Select a commodity to see its correlation with others.")
 
 tickers = {
-    "S&P 500 (ETF)": "SPY",
+    #  INDEXES & ETFs 
+    "S&P 500 (E-mini)": "ES=F",
+    "Nasdaq 100 (E-mini)": "NQ=F",
+    "Dow Jones (E-mini)": "YM=F",
+    "Russell 2000": "RTY=F",
+    "S&P 500 (SPY)": "SPY",
+    "Nasdaq 100 (QQQ)": "QQQ",
+    "Russell 2000 (IWM)": "IWM",
+
+    # METALS & MINERS 
     "Gold (Futures)": "GC=F",
     "Silver (Futures)": "SI=F",
+    "Copper (Futures)": "HG=F",
+    "Gold ETF (GLD)": "GLD",
+    "Newmont Gold Mining": "NEM",
+    "Barrick Gold": "GOLD",
+    "Freeport-McMoRan (Copper)": "FCX",
+    "Southern Copper": "SCCO",
+    
+    # ENERGY & OIL STOCKS
     "Crude Oil": "CL=F",
     "Natural Gas": "NG=F",
-    "Bitcoin": "BTC-USD"
+    "Gold": "GC=F",
+    "Silver": "SI=F",
+    "Corn": "ZC=F",
+    "Wheat": "ZW=F"
 }
 
-asset1 = st.selectbox("Select your asset:", list(tickers.keys()), index=1)
-investment = st.number_input("Investment Amount ($):", value=1000)
+asset1 = st.selectbox("Pick the first commodity:", list(tickers.keys()), index=0)
+asset2 = st.selectbox("Pick the second commodity:", list(tickers.keys()), index=1)
 
-# 1. Fetch Data for selected asset AND the Benchmark (S&P 500)
-data = yf.download([tickers[asset1], "^GSPC"], period="12mo", progress=False)["Close"]
-data = data.dropna()
+if asset1 == asset2:
+    st.warning("Please choose two different commodities.")
+else:
+    data1 = yf.download(tickers[asset1], period="12mo", progress=False, auto_adjust=True)["Close"]
+    data2 = yf.download(tickers[asset2], period="12mo", progress=False, auto_adjust=True)["Close"]
 
-# 2. Calculate Returns
-# Formula: (Current Price / Starting Price) * Investment
-start_price_asset = data[tickers[asset1]].iloc[0]
-end_price_asset = data[tickers[asset1]].iloc[-1]
-asset_final_val = (end_price_asset / start_price_asset) * investment
+    comparison_table = pd.concat([data1, data2], axis=1)
+    comparison_table.columns = [asset1, asset2]
+    comparison_table = comparison_table.dropna()
 
-start_price_bench = data["^GSPC"].iloc[0]
-end_price_bench = data["^GSPC"].iloc[-1]
-bench_final_val = (end_price_bench / start_price_bench) * investment
+    score = comparison_table[asset1].corr(comparison_table[asset2])
 
-# 3. Display Comparison
-st.subheader(f"What if you invested ${investment:,} a year ago?")
+    st.subheader("Correlation Score")
+    st.write(f"Correlation between {asset1} and {asset2} is: {score:.2f}")
 
-col1, col2 = st.columns(2)
+    st.line_chart(comparison_table)
 
-with col1:
-    st.metric(label=asset1, value=f"${asset_final_val:,.2f}", 
-              delta=f"{(asset_final_val - investment)/investment:.1%}")
-
-with col2:
-    # Benchmark Toggle logic
-    show_bench = st.toggle("Compare to S&P 500", value=True)
-    if show_bench:
-        st.metric(label="S&P 500 (Benchmark)", value=f"${bench_final_val:,.2f}", 
-                  delta=f"{(bench_final_val - investment)/investment:.1%}")
-
-# 4. Normalized Performance Chart
-st.write("### Relative Performance (Growth of $1)")
-normalized_data = data / data.iloc[0]
-st.line_chart(normalized_data)
+    # Normalize to start at 100
+    normalized_df = (comparison_table / comparison_table.iloc[0]) * 100
+    st.subheader("Price Comparison (Base 100)")
+    st.line_chart(normalized_df)
